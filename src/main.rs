@@ -5,7 +5,9 @@ struct Node<T>{
 }
 impl<'a,T: std::fmt::Display> Node<T>{
     fn mut_incr(&mut self) -> Option<&mut Node<T>>{
-        return Some(&mut *(self.next_node.as_mut().unwrap()));
+        if self.next_node.is_some(){
+            return Some(&mut *(self.next_node.as_mut().unwrap()));}
+            return None;
     }
     fn incr(&self) -> Option<&Node<T>>{
         //make sure it is a valid node to return
@@ -31,6 +33,20 @@ struct StaticLinkedList<T>{
     size:u32,
 }
 impl<'a,T: std::fmt::Display> StaticLinkedList<T>{
+    fn push(&mut self,val:T){
+        if self.root.is_none(){
+          self.root = Some(Node{value:val,next_node:None});
+          self.size = 1;
+        }else{
+          //loops through linked list and adds node to end
+          let mut node = self.root.as_mut().unwrap();
+          while node.mut_incr().is_some(){
+              node = node.mut_incr().unwrap();
+          }
+          node.add_node(val);
+          self.size+=1;
+        }
+      }
     fn print(&self){
         print!("[");
         let mut binding = Some(self.root.as_ref().unwrap());
@@ -62,7 +78,11 @@ fn main() {
     //i know want to make it easier to mutate these values.
 
     //we will now move node 1 into the linked list
-    let new_list = StaticLinkedList{root:Some(node1),size:1};
+    let mut new_list = StaticLinkedList::<i32>{root:None,size:0};
+    new_list.push(5);
+    new_list.push(7);
+    new_list.push(8);
+    println!("the size of the linked list is: {}",new_list.size);
     //should print out all values
     new_list.print();
     println!("is this on a new line")
